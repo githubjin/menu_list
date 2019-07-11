@@ -393,6 +393,7 @@ class _SecondPageState extends State<SecondPage>
                           left: 90,
                           child: CustomScrollView(
                             key: PageStorageKey<String>("subMenu"),
+                            physics: const ClampingScrollPhysics(),
                             slivers: <Widget>[
                               SliverStickyHeader(
                                 header: StickHeader("主食"),
