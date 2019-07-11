@@ -6,6 +6,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'fd/Item.dart';
 
+///
+/// 暂时可以不用了
+///
 class CardContentBloc {
   final int count;
 
@@ -362,6 +365,7 @@ class _SecondPageState extends State<SecondPage>
                           width: 90,
                           child: ListView.builder(
                             physics: ClampingScrollPhysics(),
+                            key: PageStorageKey<String>("menu"),
                             padding: EdgeInsets.all(0),
                             itemBuilder: (context, index) {
                               return Container(
@@ -388,6 +392,7 @@ class _SecondPageState extends State<SecondPage>
                           bottom: 0,
                           left: 90,
                           child: CustomScrollView(
+                            key: PageStorageKey<String>("subMenu"),
                             slivers: <Widget>[
                               SliverStickyHeader(
                                 header: StickHeader("主食"),
@@ -578,6 +583,7 @@ class _CardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     /// in no time
     return ListView(
+      physics: const NeverScrollableScrollPhysics(),
       children: <Widget>[
         Text("奥斯卡垃圾💩是的法律速度快放假后"),
         Padding(
@@ -693,6 +699,7 @@ class _Tab2 extends StatelessWidget {
       child: NotificationListener<ScrollNotification>(
         onNotification: onScroll,
         child: GridView.builder(
+          key: PageStorageKey<String>("videos"),
           physics: ClampingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
