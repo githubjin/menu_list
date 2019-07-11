@@ -657,7 +657,7 @@ class _AppBar extends AnimatedWidget {
           children: <Widget>[
             Center(
               child: Text(
-                "90后",
+                "X餐厅",
                 style: TextStyle(
                   color: appbarTitleColorAnimate.value,
                 ),
