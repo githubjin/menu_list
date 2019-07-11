@@ -1,9 +1,10 @@
 import 'dart:ui';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'fd/Item.dart';
 
 class CardContentBloc {
   final int count;
@@ -255,7 +256,11 @@ class _SecondPageState extends State<SecondPage>
 
   bool _onOverNotification(OverscrollNotification n) {
     if (n.overscroll > 0) {
-      return false;
+      if (pixcelsMovedTotal >= Values.needMove) {
+        return false;
+      }
+//      print("n.metrics.extentAfter ${n.metrics.extentAfter}");
+//      return false;
     }
     print("overscroll = ${n.overscroll}");
     var hashCode = n.context.hashCode;
@@ -276,7 +281,7 @@ class _SecondPageState extends State<SecondPage>
     if (pixels.containsKey(hashCode)) {
       var d = n.metrics.pixels - pixels[hashCode];
       print("n.metrics.pixels ${n.metrics.pixels} d = $d");
-      if(n.metrics.pixels >= 0 && d <= 0) {
+      if (n.metrics.pixels >= 0 && d <= 0) {
         return false;
       }
       pixcelsMovedTotal += (n.metrics.pixels - pixels[hashCode]);
@@ -382,40 +387,40 @@ class _SecondPageState extends State<SecondPage>
                           right: 0,
                           bottom: 0,
                           left: 90,
-                          child: ListView.builder(
-                            physics: ClampingScrollPhysics(),
-                            padding: EdgeInsets.all(0),
-                            itemCount: 130,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _count += 1;
-                                  });
-                                },
-                                child: Container(
-                                  alignment: Alignment.centerLeft,
-                                  height: 40,
-                                  child: Text("item_$index"),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border(
-                                      bottom: BorderSide(
-                                        color: Colors.orangeAccent
-                                            .withOpacity(0.3),
-                                      ),
-                                    ),
+                          child: CustomScrollView(
+                            slivers: <Widget>[
+                              SliverStickyHeader(
+                                header: StickHeader("主食"),
+                                sliver: SliverFixedExtentList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      return SubItem(index);
+                                    },
+                                    childCount: 17,
                                   ),
+                                  itemExtent: 40,
                                 ),
-                              );
-                            },
+                              ),
+                              SliverStickyHeader(
+                                header: StickHeader("小吃"),
+                                sliver: SliverFixedExtentList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      return SubItem(index);
+                                    },
+                                    childCount: 17,
+                                  ),
+                                  itemExtent: 40,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Text("123")
+                _Tab2(_onOverNotification, _onNotification),
               ]),
             ),
             _Card(animation: cardTopAnimate, cardSizeAnimate: cardSizeAnimate),
@@ -516,15 +521,15 @@ class _AnimatedAvatar extends AnimatedWidget {
       duration: Duration(milliseconds: 0),
       child: Container(
         height: animation.value,
-        width: Values.width,
+        width: animation.value,
         alignment: Alignment.center,
         child: ClipRRect(
-          borderRadius:
-              BorderRadius.all(Radius.circular(Values.avatar_size / 2)),
+          borderRadius: BorderRadius.all(Radius.circular(animation.value / 2)),
           child: Image.asset(
             "assets/pubspec.jpg",
             width: animation.value,
             height: animation.value,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -669,6 +674,38 @@ class _AppBar extends AnimatedWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Tab2 extends StatelessWidget {
+  final NotificationListenerCallback<OverscrollNotification> onOverScroll;
+  final NotificationListenerCallback<ScrollNotification> onScroll;
+
+  _Tab2(this.onOverScroll, this.onScroll);
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<OverscrollNotification>(
+      onNotification: onOverScroll,
+      child: NotificationListener<ScrollNotification>(
+        onNotification: onScroll,
+        child: GridView.builder(
+          physics: ClampingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 90,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.7),
+          itemBuilder: (c, i) {
+            return Container(
+              color: Colors.orangeAccent,
+            );
+          },
+          itemCount: 20,
         ),
       ),
     );
